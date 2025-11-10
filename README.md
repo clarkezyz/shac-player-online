@@ -79,9 +79,9 @@ For traditional desktop installation, see [SHAC Player Desktop](https://github.c
 - Face Buttons - Play/Pause, Reset
 
 **Mobile:**
-- On-screen joysticks for movement and camera
-- Tap to play/pause
-- Pinch to zoom visualization
+- Touch anywhere - Your finger position is the listener position
+- Two-finger rotate - Look around
+- Tap controls - Play/Pause
 
 ---
 
