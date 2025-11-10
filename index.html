@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>SHAC Player - Spatial Audio Player</title>
+    
+    <!-- CRITICAL: Prevent caching issues that serve desktop content to mobile -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    
+    <!-- Force mobile layout -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
+    <!-- iOS specific -->
+    <link rel="apple-touch-icon" href="/icon-192.png">
+    
+    <link rel="stylesheet" href="./styles.css?v=mobile-fix">
+</head>
+<body>
+    <div id="app">
+        <!-- Loading Screen -->
+        <div id="loading" class="screen active">
+            <div class="content">
+                <h1>SHAC Player</h1>
+                <p class="tagline">Load a .shac file to begin</p>
+                <div class="loader">
+                    <div class="pulse"></div>
+                </div>
+                <p class="status">Initializing spatial audio...</p>
+                <p class="loading-details"></p>
+            </div>
+        </div>
+
+        <!-- Main Player -->
+        <div id="player" class="screen">
+            <!-- 3D Visualization Canvas -->
+            <canvas id="visualizer"></canvas>
+            
+            <!-- Enhanced Mobile Touch Controls -->
+            <div id="mobile-controls" class="mobile-only">
+            </div>
+            
+            <!-- Control Overlay -->
+            <div class="controls">
+                <!-- Centered Song Title -->
+                <div class="song-title-center">
+                    <h2 id="track-title">No file loaded</h2>
+                    <p id="track-subtitle">Select a .shac file to begin</p>
+                </div>
+                
+                <!-- Top Right Controls -->
+                <div class="top-right-controls">
+                    <button id="fullscreen" class="control-btn icon-only" title="Fullscreen">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>
+                        </svg>
+                    </button>
+                    <button id="load-file" class="control-btn icon-only" title="Load File">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/>
+                        </svg>
+                    </button>
+                    <button id="controls-btn" class="control-btn icon-only" title="Controls">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M7 6C7 4.89 7.89 4 9 4h6c1.11 0 2 .89 2 2v12c0 1.11-.89 2-2 2H9c-1.11 0-2-.89-2-2V6zm8 10c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-2-6c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4 0c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2zm0 6c0-1.1-.9-2-2-2s-2 .9-2 2 .9 2 2 2 2-.9 2-2z"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <!-- Clean Atmosphere Selector - Left Side -->
+                <div class="atmosphere-selector">
+                    <div class="atmosphere-label">Atmosphere</div>
+                    <button id="movement-preset-btn" class="atmosphere-btn">
+                        <span id="current-movement-text">Explorer</span>
+                    </button>
+                    <div id="movement-dropdown" class="atmosphere-dropdown">
+                        <div class="movement-option active" data-value="explorer">Explorer</div>
+                        <div class="movement-option" data-value="venue">Venue</div>
+                        <div class="movement-option" data-value="asymmetric">Asymmetric</div>
+                        <div class="movement-option" data-value="stadium">Stadium</div>
+                        <div class="movement-option" data-value="elastic">Elastic</div>
+                    </div>
+                </div>
+
+                <div class="bottom-bar">
+                    <button id="replay-btn" class="control-btn">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path d="M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z"/>
+                        </svg>
+                    </button>
+                    
+                    <button id="play-pause" class="control-btn">
+                        <svg class="play-icon" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                        <svg class="pause-icon" viewBox="0 0 24 24" style="display: none;">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </button>
+                    
+                    <div class="progress-bar">
+                        <div class="progress-track">
+                            <div class="progress-fill"></div>
+                            <div class="progress-handle"></div>
+                        </div>
+                        <div class="time-display">
+                            <span id="current-time">0:00</span>
+                            <span id="total-time">0:00</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Instructions Overlay -->
+            <div id="instructions" class="overlay">
+                <div class="instruction-content">
+                    <h3>Navigate the Sound Space</h3>
+                    <div class="instruction-items">
+                        <div class="instruction">
+                            <span class="gesture">🖱️ Click & Drag</span>
+                            <span>Look around</span>
+                        </div>
+                        <div class="instruction">
+                            <span class="gesture">WASD / Arrow Keys</span>
+                            <span>Move & rotate</span>
+                        </div>
+                        <div class="instruction">
+                            <span class="gesture">🎮 Controller</span>
+                            <span>Left stick: move, Right stick: look</span>
+                        </div>
+                        <div class="instruction">
+                            <span class="gesture">💡 Tip</span>
+                            <span>Move closer to sounds to hear them more clearly</span>
+                        </div>
+                        <div class="instruction">
+                            <span class="gesture">🎧 Headphones</span>
+                            <span>Required for spatial audio</span>
+                        </div>
+                    </div>
+                    <button id="start-experience" class="primary-btn">Start Experience</button>
+                </div>
+            </div>
+            
+            <!-- No File Overlay -->
+            <div id="no-file-overlay" class="overlay">
+                <div class="file-loader-content">
+                    <button class="close-btn" id="skip-upload" title="Continue without loading a file">&times;</button>
+                    <div class="file-loader-header">
+                        <h2>Load SHAC File</h2>
+                        <p class="subtitle">Walk through Music</p>
+                    </div>
+                    
+                    <div class="file-loading-options">
+                        <div class="upload-card">
+                            <div class="drop-zone" id="drop-zone">
+                                <div class="upload-icon">
+                                    <svg viewBox="0 0 24 24" width="40" height="40">
+                                        <path d="M9 16h6v-6h4l-7-7-7 7h4v6zm-4 2h14v2H5v-2z"/>
+                                    </svg>
+                                </div>
+                                <h3>Browse or Drag & Drop</h3>
+                                <p>Select a .shac file from your device</p>
+                                <button id="browse-file" class="primary-btn">
+                                    Choose File
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="quick-links">
+                            <a href="#" id="install-pwa" class="quick-link">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M12 16l-6-6h3.5V3h5v7H18l-6 6zm-6 2h12v2H6v-2z"/>
+                                </svg>
+                                Install Player
+                            </a>
+                            <a href="https://shac.dev/gallery/" target="_blank" class="quick-link">
+                                <svg viewBox="0 0 24 24" width="20" height="20">
+                                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
+                                </svg>
+                                Browse Song Gallery
+                            </a>
+                        </div>
+                    </div>
+                    
+                    <div class="loader-footer">
+                        <p class="help-text">Studio, Demos, and Source Code available at <a href="https://shac.dev" target="_blank" style="color: #00d4ff; text-decoration: none;">SHAC.dev</a></p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- About SHAC Overlay -->
+            <!-- Controls Overlay -->
+            <div id="controls-overlay" class="overlay">
+                <div class="overlay-content">
+                    <button class="close-btn">&times;</button>
+                    <h2>Controls</h2>
+                    <div class="controls-content">
+                        <div class="controls-section">
+                            <h3>🎮 Controller</h3>
+                            <div class="control-item">
+                                <span class="control-key">Left Stick</span>
+                                <span class="control-desc">Move around space</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">Right Stick</span>
+                                <span class="control-desc">Look direction</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">Bumpers</span>
+                                <span class="control-desc">Move up/down</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">A Button</span>
+                                <span class="control-desc">Play/Pause</span>
+                            </div>
+                        </div>
+                        
+                        <div class="controls-section">
+                            <h3>⌨️ Keyboard</h3>
+                            <div class="control-item">
+                                <span class="control-key">WASD</span>
+                                <span class="control-desc">Move around space</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">Q / E</span>
+                                <span class="control-desc">Move up/down</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">Arrow Keys</span>
+                                <span class="control-desc">Look direction</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">Space</span>
+                                <span class="control-desc">Play/Pause</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">R</span>
+                                <span class="control-desc">Reset position</span>
+                            </div>
+                        </div>
+                        
+                        <div class="controls-section">
+                            <h3>📱 Touch</h3>
+                            <div class="control-item">
+                                <span class="control-key">One Finger</span>
+                                <span class="control-desc">Move around space</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">Two Fingers</span>
+                                <span class="control-desc">Look direction</span>
+                            </div>
+                            <div class="control-item">
+                                <span class="control-key">Height Buttons</span>
+                                <span class="control-desc">Move up/down</span>
+                            </div>
+                        </div>
+                        
+                        <div class="controls-section">
+                            <h3>🖱️ Mouse</h3>
+                            <div class="control-item">
+                                <span class="control-key">Click & Drag</span>
+                                <span class="control-desc">Move around space</span>
+                            </div>
+                            <div class="control-note">
+                                Mouse doesn't control listening direction
+                            </div>
+                        </div>
+                        
+                        <div class="controls-tip">
+                            <strong>💡 Tip:</strong> Use headphones for optimal spatial audio experience
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- File Input (Hidden) -->
+        <input type="file" id="file-input" accept=".shac,.zyz" style="display: none;">
+    </div>
+
+    <script src="./js/pako.min.js"></script>
+    <script src="./js/shac-decoder.js"></script>
+    <script src="./js/file-loader.js"></script>
+    <script src="./js/zus-loader.js"></script>
+    <script src="./js/movement-presets.js"></script>
+    <script src="./js/spatial-audio.js"></script>
+    <script src="./js/visualizer.js"></script>
+    <script src="./js/controls.js"></script>
+    <script src="./js/app.js"></script>
+    <script>
+        // CRITICAL: Force mobile layout detection and debugging
+        (function() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+                            window.innerWidth <= 1024 ||
+                            ('ontouchstart' in window) ||
+                            (navigator.maxTouchPoints > 0);
+            
+            // Check if this is a cached desktop version on mobile
+            const lastLayout = localStorage.getItem('shac-layout-type');
+            const currentTimestamp = Date.now();
+            const lastUpdate = localStorage.getItem('shac-layout-update') || 0;
+            
+            // Force refresh if mobile device but last layout was desktop (cache issue)
+            if (isMobile && lastLayout === 'desktop' && (currentTimestamp - lastUpdate) < 24 * 60 * 60 * 1000) {
+                console.log('Detected cached desktop content on mobile - forcing refresh');
+                localStorage.setItem('shac-layout-type', 'mobile');
+                localStorage.setItem('shac-layout-update', currentTimestamp);
+                window.location.reload(true); // Hard refresh
+                return;
+            }
+            
+            // Store current layout type
+            localStorage.setItem('shac-layout-type', isMobile ? 'mobile' : 'desktop');
+            localStorage.setItem('shac-layout-update', currentTimestamp);
+            
+            // Force mobile class on document for CSS targeting
+            if (isMobile) {
+                document.documentElement.classList.add('mobile-device');
+                document.body.classList.add('mobile-layout');
+                console.log('Mobile device detected, forcing mobile layout');
+            } else {
+                document.documentElement.classList.add('desktop-device');
+                document.body.classList.add('desktop-layout');
+                console.log('Desktop device detected');
+            }
+            
+            // Debug info for troubleshooting
+            console.log('Device info:', {
+                userAgent: navigator.userAgent,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                windowWidth: window.innerWidth,
+                windowHeight: window.innerHeight,
+                touchSupport: 'ontouchstart' in window,
+                maxTouchPoints: navigator.maxTouchPoints,
+                devicePixelRatio: window.devicePixelRatio,
+                isMobile: isMobile,
+                layoutType: isMobile ? 'mobile' : 'desktop'
+            });
+            
+            // Force viewport refresh for mobile
+            if (isMobile) {
+                const viewport = document.querySelector('meta[name=viewport]');
+                if (viewport) {
+                    viewport.content = 'width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover';
+                }
+                
+                // Additional mobile-specific DOM adjustments
+                document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+                window.addEventListener('resize', () => {
+                    document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+                });
+            }
+        })();
+        
+        // Register Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                        
+                        // Check for updates periodically
+                        setInterval(() => {
+                            registration.update();
+                        }, 60 * 60 * 1000); // Check every hour
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed:', err);
+                    });
+            });
+        }
+        
+        // Initialize the SHAC player
+        window.addEventListener('DOMContentLoaded', () => {
+            window.shacPlayer = new SHACPlayer();
+        });
+    </script>
+</body>
+</html>
