@@ -4,7 +4,7 @@
 
 Navigate through 3D audio experiences completely offline. No installation required.
 
-**[Launch Player](https://clarkezyz.github.io/shac-player-web/)** ← Try it now
+**[Launch Player](https://clarkezyz.github.io/shac-player-online/)** ← Try it now
 
 ![SHAC Player Screenshot](shac_player.png)
 
@@ -31,7 +31,7 @@ SHAC Player Web is a Progressive Web App (PWA) that plays .shac files - interact
 
 ### Option 1: Use Online (Recommended)
 
-1. Visit **[clarkezyz.github.io/shac-player-web](https://clarkezyz.github.io/shac-player-web/)**
+1. Visit **[clarkezyz.github.io/shac-player-online](https://clarkezyz.github.io/shac-player-online/)**
 2. Browser will cache the app - works offline after first visit
 3. On mobile: Tap "Add to Home Screen" to install as an app
 
@@ -129,9 +129,9 @@ This is a **Progressive Web App (PWA)** with full offline capability:
 
 ## SHAC Ecosystem
 
-**SHAC Player Web** - This application (browser-based)
-- Repository: [github.com/clarkezyz/shac-player-web](https://github.com/clarkezyz/shac-player-web)
-- Live at: [clarkezyz.github.io/shac-player-web](https://clarkezyz.github.io/shac-player-web/)
+**SHAC Player Online** - This application (browser-based)
+- Repository: [github.com/clarkezyz/shac-player-online](https://github.com/clarkezyz/shac-player-online)
+- Live at: [clarkezyz.github.io/shac-player-online](https://clarkezyz.github.io/shac-player-online/)
 
 **SHAC Player Desktop** - Offline desktop app
 - Repository: [github.com/clarkezyz/shac-player-offline](https://github.com/clarkezyz/shac-player-offline)
@@ -153,8 +153,8 @@ This is a **Progressive Web App (PWA)** with full offline capability:
 
 ```bash
 # Clone the repo
-git clone https://github.com/clarkezyz/shac-player-web.git
-cd shac-player-web
+git clone https://github.com/clarkezyz/shac-player-online.git
+cd shac-player-online
 
 # Serve with any static file server
 python3 -m http.server 8000
@@ -169,7 +169,7 @@ npx serve
 1. Fork this repository
 2. Go to Settings → Pages
 3. Set Source to "main" branch
-4. Save - your player will be live at `username.github.io/shac-player-web`
+4. Save - your player will be live at `username.github.io/shac-player-online`
 
 ---
 
