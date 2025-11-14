@@ -308,13 +308,11 @@ class SpatialAudioEngine {
             console.error('Audio data has 0 samples');
             throw new Error('Audio data has no samples');
         }
-        
-        console.log(`Creating audio buffer: ${numSamples} samples, ${header.sample_rate} Hz, ${audioData.length} channels`);
+
         const audioBuffer = this.audioContext.createBuffer(2, numSamples, header.sample_rate);
-        
+
         // Determine ambisonic order from channel count
         const order = Math.sqrt(audioData.length) - 1;
-        console.log(`Detected ambisonic order: ${order}`);
         
         // Decode using proper ambisonic to binaural conversion
         const left = audioBuffer.getChannelData(0);

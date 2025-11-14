@@ -351,8 +351,6 @@ class SHACDecoder {
         if (this.header.version !== 1) {
             throw new Error(`Unsupported SHAC version: ${this.header.version}`);
         }
-
-        console.log('SHAC Header:', this.header);
     }
 
     /**

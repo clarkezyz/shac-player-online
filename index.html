@@ -324,27 +324,10 @@
             if (isMobile) {
                 document.documentElement.classList.add('mobile-device');
                 document.body.classList.add('mobile-layout');
-                console.log('Mobile device detected, forcing mobile layout');
             } else {
                 document.documentElement.classList.add('desktop-device');
                 document.body.classList.add('desktop-layout');
-                console.log('Desktop device detected');
             }
-            
-            // Debug info for troubleshooting
-            console.log('Device info:', {
-                userAgent: navigator.userAgent,
-                screenWidth: window.screen.width,
-                screenHeight: window.screen.height,
-                windowWidth: window.innerWidth,
-                windowHeight: window.innerHeight,
-                touchSupport: 'ontouchstart' in window,
-                maxTouchPoints: navigator.maxTouchPoints,
-                devicePixelRatio: window.devicePixelRatio,
-                isMobile: isMobile,
-                layoutType: isMobile ? 'mobile' : 'desktop'
-            });
-            
             // Force viewport refresh for mobile
             if (isMobile) {
                 const viewport = document.querySelector('meta[name=viewport]');
