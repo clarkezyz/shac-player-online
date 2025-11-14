@@ -309,7 +309,6 @@
             
             // Force refresh if mobile device but last layout was desktop (cache issue)
             if (isMobile && lastLayout === 'desktop' && (currentTimestamp - lastUpdate) < 24 * 60 * 60 * 1000) {
-                console.log('Detected cached desktop content on mobile - forcing refresh');
                 localStorage.setItem('shac-layout-type', 'mobile');
                 localStorage.setItem('shac-layout-update', currentTimestamp);
                 window.location.reload(true); // Hard refresh

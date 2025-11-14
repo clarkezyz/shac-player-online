@@ -190,10 +190,6 @@ class SpatialAudioEngine {
             }
         }
 
-        if (preMixed) {
-            console.log(`Loaded ZYZ format (pre-mixed) with ${this.audioSources.length} source reference markers`);
-        } else {
-            console.log(`Loaded ${layers.size} spatial layers with positions:`, this.audioSources);
         }
     }
 

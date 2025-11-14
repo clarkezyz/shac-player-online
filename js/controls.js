@@ -94,7 +94,6 @@ class PlayerControls {
         
         // Start experience button
         this.startExperienceBtn.addEventListener('click', (e) => {
-            console.log('Start Experience button clicked!');
             e.preventDefault();
             e.stopPropagation();
             this.hideInstructions();

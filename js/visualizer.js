@@ -186,14 +186,6 @@ class SpatialVisualizer {
             
             // Enter adaptive mode if consistently slow
             this.adaptiveMode = averageFrameTime > this.stressThreshold;
-            
-            // Log mode changes for debugging
-            if (this.adaptiveMode !== wasAdaptive) {
-                console.log(this.adaptiveMode ? 
-                    `🎨 Adaptive rendering enabled (avg frame time: ${averageFrameTime.toFixed(1)}ms)` :
-                    `🎨 Adaptive rendering disabled (avg frame time: ${averageFrameTime.toFixed(1)}ms)`
-                );
-            }
         }
     }
 
